@@ -1,0 +1,451 @@
+
+```html
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#050810">
+<title>🛡️ פיקוד העורף — מעקב חי</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050810;
+    color: #ddd;
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    direction: rtl;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body.alert-active { background: #0d0000; }
+  #topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid #1a1f2e;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  #topbar.alert-active { border-bottom-color: #ff3333; }
+  #title { font-size: 16px; font-weight: 700; }
+  #lastupdate { font-size: 11px; color: #555; margin-top: 2px; }
+  #btn-wakelock {
+    background: #1e2235;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #aaa;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+  #btn-wakelock.active {
+    background: #065f46;
+    border-color: #10b981;
+    color: #10b981;
+  }
+  #btn-demo {
+    background: #1e2235;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #aaa;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  #btn-demo.active { background: #4c1d95; border-color: #7c3aed; color: #c4b5fd; }
+  #alert-banner {
+    display: none;
+    background: linear-gradient(135deg, #7f0000, #cc0000);
+    padding: 14px 16px;
+    text-align: center;
+  }
+  #alert-banner.show { display: block; }
+  #alert-title { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+  #alert-cities { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .alert-city {
+    background: rgba(0,0,0,0.4);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  #status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  #status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulse 2s infinite;
+  }
+  #status-dot.alert { background: #ef4444; animation: pulse 0.7s infinite; }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.4); }
+  }
+  #main { display: flex; }
+  #map-wrap {
+    flex: 0 0 55%;
+    background: radial-gradient(ellipse at 40% 40%, #0a1628 0%, #050810 100%);
+    border-left: 1px solid #1a1f2e;
+    position: relative;
+  }
+  #map-wrap svg { width: 100%; height: auto; display: block; }
+  .region-path { transition: fill 0.3s; cursor: pointer; }
+  #panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+  .panel-section {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1a1f2e;
+  }
+  .section-label {
+    font-size: 10px;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .region-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 7px;
+    border-radius: 5px;
+    font-size: 11px;
+    color: #6b8cc7;
+    border: 1px solid transparent;
+    margin: 2px;
+    transition: background 0.2s;
+  }
+  .region-tag.alerted {
+    color: #fca5a5;
+    background: rgba(239,68,68,0.15);
+    border-color: rgba(239,68,68,0.4);
+  }
+  .region-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #1e3a5f;
+    border: 1px solid #2563eb;
+    flex-shrink: 0;
+  }
+  .region-dot.alerted { background: #ef4444; border-color: #ef4444; }
+  #history { padding: 10px 12px; }
+  .hist-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid #1a1f2e;
+    border-radius: 7px;
+    padding: 7px 9px;
+    margin-bottom: 6px;
+  }
+  .hist-time { font-size: 10px; color: #555; margin-bottom: 4px; }
+  .hist-city {
+    display: inline-block;
+    background: rgba(239,68,68,0.1);
+    color: #fca5a5;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+    margin: 1px;
+  }
+  #footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-top: 1px solid #1a1f2e;
+    font-size: 10px;
+    color: #444;
+    position: sticky;
+    bottom: 0;
+    background: #050810;
+  }
+  @keyframes ripple {
+    0% { stroke-opacity: 0.8; stroke-width: 2; }
+    100% { stroke-opacity: 0; stroke-width: 8; }
+  }
+  .ripple-path { animation: ripple 1.2s ease-out infinite; }
+</style>
+</head>
+<body>
+<div id="topbar">
+  <div>
+    <div id="title">🛡️ פיקוד העורף — מעקב חי</div>
+    <div id="lastupdate">מתחבר...</div>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <button id="btn-demo" onclick="toggleDemo()">▶ דמו</button>
+    <button id="btn-wakelock" onclick="toggleWakeLock()">💤 נעל מסך</button>
+  </div>
+</div>
+<div id="alert-banner">
+  <div id="alert-title">🚨 התראת ירי — כנסו למרחב מוגן!</div>
+  <div id="alert-cities"></div>
+</div>
+<div id="status-bar">
+  <div id="status-dot"></div>
+  <span id="status-text">אין התראות פעילות</span>
+</div>
+<div id="main">
+  <div id="map-wrap">
+    <svg id="map-svg" viewBox="90 10 190 310">
+      <defs>
+        <radialGradient id="mapGlow" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0.08"/>
+          <stop offset="100%" stop-color="#050810" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="alertGlow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect x="80" y="5" width="200" height="320" fill="url(#mapGlow)"/>
+      <text x="115" y="160" fill="#1d4ed820" font-size="7" font-style="italic" transform="rotate(-90,115,160)">ים תיכון</text>
+      <g id="region-north" data-label="צפון">
+        <path class="region-path" d="M 180,20 L 220,18 L 240,35 L 235,55 L 225,70 L 210,75 L 195,68 L 178,60 L 170,45 L 172,30 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="205" y="47" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">צפון</text>
+      </g>
+      <g id="region-haifa" data-label="חיפה">
+        <path class="region-path" d="M 165,70 L 178,60 L 195,68 L 210,75 L 215,88 L 205,98 L 188,100 L 170,92 L 158,82 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="188" y="86" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">חיפה</text>
+      </g>
+      <g id="region-sharon" data-label="שרון">
+        <path class="region-path" d="M 142,95 L 158,82 L 170,92 L 188,100 L 192,118 L 180,130 L 162,128 L 145,118 L 138,108 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="165" y="112" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">שרון</text>
+      </g>
+      <g id="region-center" data-label="מרכז">
+        <path class="region-path" d="M 135,125 L 145,118 L 162,128 L 180,130 L 182,148 L 170,160 L 152,158 L 135,148 L 128,138 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="155" y="143" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">מרכז</text>
+      </g>
+      <g id="region-dan" data-label="גוש דן">
+        <path class="region-path" d="M 128,155 L 135,148 L 152,158 L 170,160 L 172,175 L 160,183 L 142,180 L 128,170 L 122,162 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="148" y="170" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">גוש דן</text>
+      </g>
+      <g id="region-jerusalem" data-label="ירושלים">
+        <path class="region-path" d="M 185,145 L 200,140 L 218,148 L 222,165 L 212,175 L 195,173 L 182,162 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="202" y="160" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">י-ם</text>
+      </g>
+      <g id="region-shfela" data-label="שפלה">
+        <path class="region-path" d="M 122,175 L 128,170 L 142,180 L 160,183 L 162,200 L 148,210 L 130,205 L 118,192 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="140" y="194" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">שפלה</text>
+      </g>
+      <g id="region-negev_north" data-label="נגב צפוני">
+        <path class="region-path" d="M 115,208 L 118,192 L 130,205 L 148,210 L 155,230 L 148,248 L 130,250 L 112,238 L 108,222 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="132" y="228" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">נגב צ'</text>
+      </g>
+      <g id="region-negev_south" data-label="נגב דרומי">
+        <path class="region-path" d="M 108,248 L 112,238 L 130,250 L 148,248 L 152,275 L 142,295 L 125,305 L 108,292 L 100,270 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="128" y="273" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">נגב ד'</text>
+      </g>
+      <g id="region-jordan_valley" data-label="בקעת הירדן">
+        <path class="region-path" d="M 225,70 L 250,65 L 265,80 L 262,110 L 252,130 L 238,140 L 222,132 L 218,115 L 222,95 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="242" y="103" text-anchor="middle" fill="#4a7cbf" font-size="5" pointer-events="none">בקעה</text>
+      </g>
+      <g id="region-west_bank_north" data-label="שומרון">
+        <path class="region-path" d="M 195,98 L 215,88 L 230,95 L 238,115 L 232,130 L 222,132 L 212,125 L 200,115 L 192,105 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
+        <text x="215" y="115" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">שומרון</text>
+      </g>
+      <circle id="status-circle" cx="108" cy="18" r="4" fill="#10b981">
+        <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <text id="status-map-text" x="115" y="21" fill="#10b981" font-size="6" font-weight="bold">✓ שקט</text>
+      <g transform="translate(260,40)">
+        <circle r="12" fill="rgba(0,0,0,0.6)" stroke="#334" stroke-width="0.5"/>
+        <text text-anchor="middle" y="-4" fill="#4a7cbf" font-size="6" font-weight="bold">N</text>
+        <text text-anchor="middle" y="9" fill="#335" font-size="5">S</text>
+        <text x="-8" y="3" fill="#335" font-size="5">W</text>
+        <text x="5" y="3" fill="#335" font-size="5">E</text>
+        <line x1="0" y1="-8" x2="0" y2="-3" stroke="#4a7cbf" stroke-width="1"/>
+      </g>
+    </svg>
+  </div>
+  <div id="panel">
+    <div class="panel-section">
+      <div class="section-label">אזורים</div>
+      <div id="region-tags"></div>
+    </div>
+    <div id="history">
+      <div class="section-label">היסטוריה</div>
+      <div id="history-list"><div style="color:#333;font-size:12px;text-align:center;padding:10px">אין היסטוריה עדיין</div></div>
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <span>⟳ עדכון כל 5 שניות</span>
+  <span id="footer-wakelock" style="color:#555">💤 מסך פנוי</span>
+</div>
+<script>
+const REGIONS = [
+  { id: "north",        label: "צפון",        cities: ["קריית שמונה","צפת","נהריה","עכו","כרמיאל","מעלות","קצרין"] },
+  { id: "haifa",        label: "חיפה",        cities: ["חיפה","קריית ביאליק","קריית אתא","קריית מוצקין","טירת כרמל","זיכרון יעקב"] },
+  { id: "sharon",       label: "שרון",        cities: ["נתניה","הרצליה","כפר סבא","רעננה","הוד השרון","אלקנה"] },
+  { id: "center",       label: "מרכז",        cities: ["תל אביב","רמת גן","בני ברק","פתח תקווה","גבעתיים","חולון","בת ים","אור יהודה"] },
+  { id: "dan",          label: "גוש דן",      cities: ["ראשון לציון","אשדוד","רחובות","לוד","רמלה","מודיעין","יבנה","גדרה"] },
+  { id: "jerusalem",    label: "ירושלים",     cities: ["ירושלים","בית שמש","מעלה אדומים"] },
+  { id: "shfela",       label: "שפלה",        cities: ["אשקלון","קריית גת","שדרות","נתיבות","קריית מלאכי","אופקים"] },
+  { id: "negev_north",  label: "נגב צפוני",   cities: ["באר שבע","דימונה","ערד","רהט","ירוחם","תל שבע"] },
+  { id: "negev_south",  label: "נגב דרומי",   cities: ["מצפה רמון","אילת","יוטבתה","עין יהב"] },
+  { id: "jordan_valley",label: "בקעה",        cities: ["בית שאן","טבריה","יריחו","בקעת הירדן"] },
+  { id: "west_bank_north",label: "שומרון",    cities: ["שכם","טול כרם","קלקיליה","אריאל","כדומים"] },
+];
+const DEMO_SCENARIOS = [
+  ["תל אביב","רמת גן","גבעתיים","בני ברק"],
+  ["חיפה","קריית ביאליק","קריית אתא"],
+  ["אשקלון","שדרות","נתיבות","אופקים"],
+  ["באר שבע","ירוחם","דימונה"],
+  [],
+];
+let alertCities=[], alertHistory=[], wakeLockObj=null, wakeLockActive=false;
+let demoMode=false, demoIndex=0, flashOn=true, fetchInterval=null;
+setInterval(()=>{ flashOn=!flashOn; updateMapColors(); },600);
+function buildRegionTags(){
+  const wrap=document.getElementById("region-tags"); wrap.innerHTML="";
+  REGIONS.forEach(r=>{
+    const tag=document.createElement("span");
+    tag.className="region-tag"; tag.id="tag-"+r.id;
+    tag.innerHTML=`<span class="region-dot" id="dot-${r.id}"></span>${r.label}`;
+    wrap.appendChild(tag);
+  });
+}
+function getAlertedRegionIds(cities){
+  if(!cities||cities.length===0) return new Set();
+  const alerted=new Set();
+  REGIONS.forEach(r=>{ cities.forEach(city=>{ if(r.cities.some(c=>city.includes(c)||c.includes(city))) alerted.add(r.id); }); });
+  return alerted;
+}
+function updateUI(cities){
+  const alerted=getAlertedRegionIds(cities), hasAlert=cities.length>0;
+  document.body.classList.toggle("alert-active",hasAlert);
+  document.getElementById("topbar").classList.toggle("alert-active",hasAlert);
+  const banner=document.getElementById("alert-banner");
+  if(hasAlert){ banner.classList.add("show"); document.getElementById("alert-cities").innerHTML=cities.map(c=>`<span class="alert-city">${c}</span>`).join(""); }
+  else banner.classList.remove("show");
+  document.getElementById("status-dot").className=hasAlert?"alert":"";
+  document.getElementById("status-text").textContent=hasAlert?`התראה פעילה — ${cities.length} אזורים`:"אין התראות פעילות";
+  const sc=document.getElementById("status-circle"), st=document.getElementById("status-map-text");
+  sc.setAttribute("fill",hasAlert?"#ef4444":"#10b981");
+  st.setAttribute("fill",hasAlert?"#ef4444":"#10b981");
+  st.textContent=hasAlert?"⚠ התראה":"✓ שקט";
+  REGIONS.forEach(r=>{
+    const tag=document.getElementById("tag-"+r.id), dot=document.getElementById("dot-"+r.id);
+    if(alerted.has(r.id)){ tag.classList.add("alerted"); dot.classList.add("alerted"); }
+    else{ tag.classList.remove("alerted"); dot.classList.remove("alerted"); }
+  });
+  updateMapColors(alerted);
+}
+function updateMapColors(alerted){
+  if(!alerted) alerted=getAlertedRegionIds(alertCities);
+  REGIONS.forEach(r=>{
+    const g=document.getElementById("region-"+r.id); if(!g) return;
+    const path=g.querySelector("path"), label=g.querySelector("text");
+    const isAlerted=alerted.has(r.id);
+    const old=g.querySelector(".ripple-path"); if(old) old.remove();
+    if(isAlerted){
+      path.setAttribute("fill",flashOn?"#ef4444":"#991b1b");
+      path.setAttribute("stroke","#ff6666"); path.setAttribute("stroke-width","1.5");
+      path.setAttribute("filter","url(#alertGlow)");
+      if(label) label.setAttribute("fill","#ffcccc");
+      if(flashOn){
+        const ripple=document.createElementNS("http://www.w3.org/2000/svg","path");
+        ripple.setAttribute("d",path.getAttribute("d")); ripple.setAttribute("fill","none");
+        ripple.setAttribute("stroke","#ff4444"); ripple.setAttribute("stroke-width","3");
+        ripple.setAttribute("stroke-opacity","0.6"); ripple.classList.add("ripple-path");
+        g.appendChild(ripple);
+      }
+    } else {
+      path.setAttribute("fill","#0f1f3d"); path.setAttribute("stroke","#2563eb");
+      path.setAttribute("stroke-width","0.8"); path.removeAttribute("filter");
+      if(label) label.setAttribute("fill","#4a7cbf");
+    }
+  });
+}
+function addHistory(cities){
+  if(cities.length===0) return;
+  alertHistory.unshift({cities:[...cities],time:new Date().toLocaleTimeString("he-IL")});
+  if(alertHistory.length>10) alertHistory.pop();
+  renderHistory();
+}
+function renderHistory(){
+  const list=document.getElementById("history-list");
+  if(alertHistory.length===0){ list.innerHTML='<div style="color:#333;font-size:12px;text-align:center;padding:10px">אין היסטוריה עדיין</div>'; return; }
+  list.innerHTML=alertHistory.map((h,i)=>`<div class="hist-item" style="opacity:${1-i*0.08}"><div class="hist-time">🕐 ${h.time}</div><div>${h.cities.map(c=>`<span class="hist-city">${c}</span>`).join("")}</div></div>`).join("");
+}
+async function fetchOref(){
+  try{
+    const res=await fetch("https://www.oref.org.il/WarningMessages/alert/alerts.json",{headers:{"X-Requested-With":"XMLHttpRequest","Referer":"https://www.oref.org.il/"},cache:"no-store"});
+    const text=(await res.text()).replace(/^\uFEFF/,"").trim();
+    const cities=text?(JSON.parse(text).data||[]):[];
+    if(cities.length>alertCities.length&&cities.length>0){ playBeep(); addHistory(cities); }
+    alertCities=cities; updateUI(cities);
+  }catch(e){}
+  document.getElementById("lastupdate").textContent="עודכן: "+new Date().toLocaleTimeString("he-IL");
+}
+function playBeep(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [0,0.35,0.7].forEach(delay=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=delay===0.35?660:880;
+      g.gain.setValueAtTime(0.25,ctx.currentTime+delay);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+0.3);
+      o.start(ctx.currentTime+delay); o.stop(ctx.currentTime+delay+0.35);
+    });
+  }catch(e){}
+}
+function toggleDemo(){
+  demoMode=!demoMode;
+  const btn=document.getElementById("btn-demo");
+  btn.textContent=demoMode?"■ עצור דמו":"▶ דמו";
+  btn.classList.toggle("active",demoMode);
+  if(!demoMode){ alertCities=[]; updateUI([]); } else runDemo();
+}
+function runDemo(){
+  if(!demoMode) return;
+  const cities=DEMO_SCENARIOS[demoIndex%DEMO_SCENARIOS.length]; demoIndex++;
+  if(cities.length>0){ playBeep(); addHistory(cities); }
+  alertCities=cities; updateUI(cities);
+  document.getElementById("lastupdate").textContent="דמו — "+new Date().toLocaleTimeString("he-IL");
+  setTimeout(runDemo,3000);
+}
+async function toggleWakeLock(){
+  const btn=document.getElementById("btn-wakelock"), footer=document.getElementById("footer-wakelock");
+  if(!("wakeLock" in navigator)){ alert("הדפדפן שלך לא תומך ב-Wake Lock.\nנסה כרום עדכני."); return; }
+  if(!wakeLockActive){
+    try{
+      wakeLockObj=await navigator.wakeLock.request("screen");
+      wakeLockActive=true; btn.textContent="☀️ מסך נעול"; btn.classList.add("active");
+      footer.textContent="☀️ מסך נעול"; footer.style.color="#10b981";
+      wakeLockObj.addEventListener("release",()=>{ wakeLockActive=false; btn.textContent="💤 נעל מסך"; btn.classList.remove("active"); footer.textContent="💤 מסך פנוי"; footer.style.color="#555"; });
+    }catch(e){ alert("שגיאה: "+e.message); }
+  } else { await wakeLockObj.release(); }
+}
+document.addEventListener("visibilitychange",async()=>{
+  if(wakeLockActive&&document.visibilityState==="visible"){
+    try{ wakeLockObj=await navigator.wakeLock.request("screen"); }catch(e){}
+  }
+});
+buildRegionTags(); updateUI([]); fetchOref();
+fetchInterval=setInterval(()=>{ if(!demoMode) fetchOref(); },5000);
+</script>
+</body>
+</html>
+```
