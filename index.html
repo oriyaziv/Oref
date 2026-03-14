@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -8,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="theme-color" content="#050810">
-<title>🛡️ פיקוד העורף — מעקב חי</title>
+<title>🛡️ פיקוד העורף — טבריה</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -32,7 +31,7 @@
     z-index: 100;
   }
   #topbar.alert-active { border-bottom-color: #ff3333; }
-  #title { font-size: 16px; font-weight: 700; }
+  #title { font-size: 15px; font-weight: 700; }
   #lastupdate { font-size: 11px; color: #555; margin-top: 2px; }
   #btn-wakelock {
     background: #1e2235;
@@ -43,13 +42,9 @@
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
-    margin-right: 8px;
+    margin-right: 6px;
   }
-  #btn-wakelock.active {
-    background: #065f46;
-    border-color: #10b981;
-    color: #10b981;
-  }
+  #btn-wakelock.active { background: #065f46; border-color: #10b981; color: #10b981; }
   #btn-demo {
     background: #1e2235;
     border: 1px solid #333;
@@ -67,7 +62,8 @@
     text-align: center;
   }
   #alert-banner.show { display: block; }
-  #alert-title { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+  #alert-title { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
+  #alert-timer { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
   #alert-cities { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
   .alert-city {
     background: rgba(0,0,0,0.4);
@@ -75,6 +71,11 @@
     padding: 3px 10px;
     font-size: 13px;
     font-weight: 600;
+  }
+  .alert-city.tiberias {
+    background: rgba(255,255,0,0.25);
+    border: 1px solid rgba(255,255,0,0.6);
+    color: #fff;
   }
   #status-bar {
     display: flex;
@@ -88,6 +89,7 @@
     border-radius: 50%;
     background: #10b981;
     animation: pulse 2s infinite;
+    flex-shrink: 0;
   }
   #status-dot.alert { background: #ef4444; animation: pulse 0.7s infinite; }
   @keyframes pulse {
@@ -102,7 +104,7 @@
     position: relative;
   }
   #map-wrap svg { width: 100%; height: auto; display: block; }
-  .region-path { transition: fill 0.3s; cursor: pointer; }
+  .region-path { cursor: pointer; }
   #panel {
     flex: 1;
     display: flex;
@@ -110,83 +112,46 @@
     max-height: calc(100vh - 60px);
     overflow-y: auto;
   }
-  .panel-section {
-    padding: 10px 12px;
-    border-bottom: 1px solid #1a1f2e;
-  }
+  .panel-section { padding: 10px 12px; border-bottom: 1px solid #1a1f2e; }
   .section-label {
-    font-size: 10px;
-    color: #555;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+    font-size: 10px; color: #555; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
   }
   .region-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 7px;
-    border-radius: 5px;
-    font-size: 11px;
-    color: #6b8cc7;
-    border: 1px solid transparent;
-    margin: 2px;
-    transition: background 0.2s;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 7px; border-radius: 5px; font-size: 11px;
+    color: #6b8cc7; border: 1px solid transparent; margin: 2px;
   }
-  .region-tag.alerted {
-    color: #fca5a5;
-    background: rgba(239,68,68,0.15);
-    border-color: rgba(239,68,68,0.4);
-  }
+  .region-tag.alerted { color: #fca5a5; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); }
+  .region-tag.tiberias-tag { color: #fde68a; font-weight: 700; }
+  .region-tag.tiberias-tag.alerted { color: #fef08a; background: rgba(234,179,8,0.2); border-color: rgba(234,179,8,0.5); }
   .region-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: #1e3a5f;
-    border: 1px solid #2563eb;
-    flex-shrink: 0;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #1e3a5f; border: 1px solid #2563eb; flex-shrink: 0;
   }
   .region-dot.alerted { background: #ef4444; border-color: #ef4444; }
   #history { padding: 10px 12px; }
   .hist-item {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid #1a1f2e;
-    border-radius: 7px;
-    padding: 7px 9px;
-    margin-bottom: 6px;
+    background: rgba(255,255,255,0.03); border: 1px solid #1a1f2e;
+    border-radius: 7px; padding: 7px 9px; margin-bottom: 6px;
   }
   .hist-time { font-size: 10px; color: #555; margin-bottom: 4px; }
   .hist-city {
-    display: inline-block;
-    background: rgba(239,68,68,0.1);
-    color: #fca5a5;
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 10px;
-    margin: 1px;
+    display: inline-block; background: rgba(239,68,68,0.1);
+    color: #fca5a5; border-radius: 4px; padding: 1px 6px; font-size: 10px; margin: 1px;
   }
   #footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 12px;
-    border-top: 1px solid #1a1f2e;
-    font-size: 10px;
-    color: #444;
-    position: sticky;
-    bottom: 0;
-    background: #050810;
+    display: flex; justify-content: space-between; padding: 8px 12px;
+    border-top: 1px solid #1a1f2e; font-size: 10px; color: #444;
+    position: sticky; bottom: 0; background: #050810;
   }
-  @keyframes ripple {
-    0% { stroke-opacity: 0.8; stroke-width: 2; }
-    100% { stroke-opacity: 0; stroke-width: 8; }
-  }
-  .ripple-path { animation: ripple 1.2s ease-out infinite; }
 </style>
 </head>
 <body>
+
 <div id="topbar">
   <div>
-    <div id="title">🛡️ פיקוד העורף — מעקב חי</div>
+    <div id="title">🛡️ פיקוד העורף — טבריה והסביבה</div>
     <div id="lastupdate">מתחבר...</div>
   </div>
   <div style="display:flex;gap:6px;align-items:center">
@@ -194,91 +159,159 @@
     <button id="btn-wakelock" onclick="toggleWakeLock()">💤 נעל מסך</button>
   </div>
 </div>
+
 <div id="alert-banner">
-  <div id="alert-title">🚨 התראת ירי — כנסו למרחב מוגן!</div>
+  <div id="alert-title">🚨 היכנסו למרחב מוגן!</div>
+  <div id="alert-timer"></div>
   <div id="alert-cities"></div>
 </div>
+
 <div id="status-bar">
   <div id="status-dot"></div>
   <span id="status-text">אין התראות פעילות</span>
 </div>
+
 <div id="main">
   <div id="map-wrap">
-    <svg id="map-svg" viewBox="90 10 190 310">
+    <svg id="map-svg" viewBox="190 20 90 100">
       <defs>
         <radialGradient id="mapGlow" cx="50%" cy="50%" r="60%">
-          <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0.08"/>
+          <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0.1"/>
           <stop offset="100%" stop-color="#050810" stop-opacity="0"/>
         </radialGradient>
         <filter id="alertGlow">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="cityGlow">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <rect x="80" y="5" width="200" height="320" fill="url(#mapGlow)"/>
-      <text x="115" y="160" fill="#1d4ed820" font-size="7" font-style="italic" transform="rotate(-90,115,160)">ים תיכון</text>
-      <g id="region-north" data-label="צפון">
-        <path class="region-path" d="M 180,20 L 220,18 L 240,35 L 235,55 L 225,70 L 210,75 L 195,68 L 178,60 L 170,45 L 172,30 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="205" y="47" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">צפון</text>
+
+      <rect x="185" y="15" width="100" height="115" fill="url(#mapGlow)"/>
+
+      <!-- Kinneret lake -->
+      <ellipse cx="240" cy="65" rx="10" ry="18" fill="#0c2a4a" stroke="#1d4ed840" stroke-width="0.5"/>
+      <text x="240" y="66" text-anchor="middle" fill="#1d4ed860" font-size="4" font-style="italic">כינרת</text>
+
+      <!-- Jordan river line -->
+      <path d="M 240,83 Q 242,90 240,100 Q 238,108 240,115" fill="none" stroke="#0c2a4a" stroke-width="1.5"/>
+
+      <!-- Region background for "north rest" -->
+      <rect x="195" y="18" width="75" height="30" rx="3" fill="#0a1525" stroke="#1a2a40" stroke-width="0.5"/>
+      <text x="232" y="30" text-anchor="middle" fill="#2a4a7f" font-size="5">שאר הצפון</text>
+
+      <!-- City dots — טבריה ואזור -->
+      <!-- טבריה — highlighted -->
+      <g id="city-tiberias">
+        <circle cx="232" cy="62" r="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="0.8"/>
+        <circle id="dot-tiberias" cx="232" cy="62" r="2.5" fill="#3b82f6"/>
+        <text x="225" y="60" text-anchor="middle" fill="#93c5fd" font-size="5" font-weight="bold">טבריה</text>
       </g>
-      <g id="region-haifa" data-label="חיפה">
-        <path class="region-path" d="M 165,70 L 178,60 L 195,68 L 210,75 L 215,88 L 205,98 L 188,100 L 170,92 L 158,82 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="188" y="86" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">חיפה</text>
+
+      <!-- צמח -->
+      <g id="city-tzamach">
+        <circle cx="238" cy="83" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-tzamach" cx="238" cy="83" r="1.5" fill="#2563eb"/>
+        <text x="244" y="85" text-anchor="start" fill="#4a7cbf" font-size="4">צמח</text>
       </g>
-      <g id="region-sharon" data-label="שרון">
-        <path class="region-path" d="M 142,95 L 158,82 L 170,92 L 188,100 L 192,118 L 180,130 L 162,128 L 145,118 L 138,108 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="165" y="112" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">שרון</text>
+
+      <!-- כינרת (ישוב) -->
+      <g id="city-kinneret">
+        <circle cx="234" cy="80" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-kinneret" cx="234" cy="80" r="1.5" fill="#2563eb"/>
+        <text x="222" y="82" text-anchor="middle" fill="#4a7cbf" font-size="4">כינרת</text>
       </g>
-      <g id="region-center" data-label="מרכז">
-        <path class="region-path" d="M 135,125 L 145,118 L 162,128 L 180,130 L 182,148 L 170,160 L 152,158 L 135,148 L 128,138 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="155" y="143" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">מרכז</text>
+
+      <!-- בית ירח -->
+      <g id="city-beit-yerach">
+        <circle cx="230" cy="82" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-beit-yerach" cx="230" cy="82" r="1.5" fill="#2563eb"/>
+        <text x="224" y="88" text-anchor="middle" fill="#4a7cbf" font-size="3.5">ב. ירח</text>
       </g>
-      <g id="region-dan" data-label="גוש דן">
-        <path class="region-path" d="M 128,155 L 135,148 L 152,158 L 170,160 L 172,175 L 160,183 L 142,180 L 128,170 L 122,162 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="148" y="170" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">גוש דן</text>
+
+      <!-- מגדל -->
+      <g id="city-migdal">
+        <circle cx="228" cy="55" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-migdal" cx="228" cy="55" r="1.5" fill="#2563eb"/>
+        <text x="222" y="53" text-anchor="middle" fill="#4a7cbf" font-size="4">מגדל</text>
       </g>
-      <g id="region-jerusalem" data-label="ירושלים">
-        <path class="region-path" d="M 185,145 L 200,140 L 218,148 L 222,165 L 212,175 L 195,173 L 182,162 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="202" y="160" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">י-ם</text>
+
+      <!-- גינוסר -->
+      <g id="city-ginosar">
+        <circle cx="225" cy="50" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-ginosar" cx="225" cy="50" r="1.5" fill="#2563eb"/>
+        <text x="218" y="48" text-anchor="middle" fill="#4a7cbf" font-size="4">גינוסר</text>
       </g>
-      <g id="region-shfela" data-label="שפלה">
-        <path class="region-path" d="M 122,175 L 128,170 L 142,180 L 160,183 L 162,200 L 148,210 L 130,205 L 118,192 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="140" y="194" text-anchor="middle" fill="#4a7cbf" font-size="6" pointer-events="none">שפלה</text>
+
+      <!-- ארבל -->
+      <g id="city-arbel">
+        <circle cx="222" cy="57" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-arbel" cx="222" cy="57" r="1.5" fill="#2563eb"/>
+        <text x="215" y="55" text-anchor="middle" fill="#4a7cbf" font-size="4">ארבל</text>
       </g>
-      <g id="region-negev_north" data-label="נגב צפוני">
-        <path class="region-path" d="M 115,208 L 118,192 L 130,205 L 148,210 L 155,230 L 148,248 L 130,250 L 112,238 L 108,222 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="132" y="228" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">נגב צ'</text>
+
+      <!-- כפר כנא -->
+      <g id="city-kafr-kana">
+        <circle cx="215" cy="48" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-kafr-kana" cx="215" cy="48" r="1.5" fill="#2563eb"/>
+        <text x="208" y="46" text-anchor="middle" fill="#4a7cbf" font-size="3.5">כ. כנא</text>
       </g>
-      <g id="region-negev_south" data-label="נגב דרומי">
-        <path class="region-path" d="M 108,248 L 112,238 L 130,250 L 148,248 L 152,275 L 142,295 L 125,305 L 108,292 L 100,270 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="128" y="273" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">נגב ד'</text>
+
+      <!-- לביא -->
+      <g id="city-lavie">
+        <circle cx="213" cy="55" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-lavie" cx="213" cy="55" r="1.5" fill="#2563eb"/>
+        <text x="206" y="53" text-anchor="middle" fill="#4a7cbf" font-size="4">לביא</text>
       </g>
-      <g id="region-jordan_valley" data-label="בקעת הירדן">
-        <path class="region-path" d="M 225,70 L 250,65 L 265,80 L 262,110 L 252,130 L 238,140 L 222,132 L 218,115 L 222,95 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="242" y="103" text-anchor="middle" fill="#4a7cbf" font-size="5" pointer-events="none">בקעה</text>
+
+      <!-- גולני -->
+      <g id="city-golani">
+        <circle cx="210" cy="62" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-golani" cx="210" cy="62" r="1.5" fill="#2563eb"/>
+        <text x="203" y="60" text-anchor="middle" fill="#4a7cbf" font-size="3.5">צ. גולני</text>
       </g>
-      <g id="region-west_bank_north" data-label="שומרון">
-        <path class="region-path" d="M 195,98 L 215,88 L 230,95 L 238,115 L 232,130 L 222,132 L 212,125 L 200,115 L 192,105 Z" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.8"/>
-        <text x="215" y="115" text-anchor="middle" fill="#4a7cbf" font-size="5.5" pointer-events="none">שומרון</text>
+
+      <!-- גבעת אבני -->
+      <g id="city-givat-avni">
+        <circle cx="218" cy="65" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-givat-avni" cx="218" cy="65" r="1.5" fill="#2563eb"/>
+        <text x="211" y="69" text-anchor="middle" fill="#4a7cbf" font-size="3.5">ג. אבני</text>
       </g>
-      <circle id="status-circle" cx="108" cy="18" r="4" fill="#10b981">
-        <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/>
+
+      <!-- כפר זיתים -->
+      <g id="city-kafr-zeitim">
+        <circle cx="223" cy="63" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-kafr-zeitim" cx="223" cy="63" r="1.5" fill="#2563eb"/>
+        <text x="218" y="70" text-anchor="middle" fill="#4a7cbf" font-size="3.5">כ. זיתים</text>
+      </g>
+
+      <!-- כפר חיטים -->
+      <g id="city-kafr-hitim">
+        <circle cx="220" cy="59" r="3" fill="#0f1f3d" stroke="#2563eb" stroke-width="0.6"/>
+        <circle id="dot-kafr-hitim" cx="220" cy="59" r="1.5" fill="#2563eb"/>
+        <text x="213" y="63" text-anchor="middle" fill="#4a7cbf" font-size="3.5">כ. חיטים</text>
+      </g>
+
+      <!-- Status indicator -->
+      <circle id="status-circle" cx="198" cy="22" r="3" fill="#10b981">
+        <animate attributeName="r" values="2;4;2" dur="2s" repeatCount="indefinite"/>
         <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite"/>
       </circle>
-      <text id="status-map-text" x="115" y="21" fill="#10b981" font-size="6" font-weight="bold">✓ שקט</text>
-      <g transform="translate(260,40)">
-        <circle r="12" fill="rgba(0,0,0,0.6)" stroke="#334" stroke-width="0.5"/>
-        <text text-anchor="middle" y="-4" fill="#4a7cbf" font-size="6" font-weight="bold">N</text>
-        <text text-anchor="middle" y="9" fill="#335" font-size="5">S</text>
-        <text x="-8" y="3" fill="#335" font-size="5">W</text>
-        <text x="5" y="3" fill="#335" font-size="5">E</text>
-        <line x1="0" y1="-8" x2="0" y2="-3" stroke="#4a7cbf" stroke-width="1"/>
-      </g>
+      <text id="status-map-text" x="204" y="24.5" fill="#10b981" font-size="4.5" font-weight="bold">✓ שקט</text>
+
+      <!-- Legend -->
+      <circle cx="198" cy="112" r="2" fill="#3b82f6"/>
+      <text x="202" y="114" fill="#93c5fd" font-size="3.5">טבריה</text>
+      <circle cx="198" cy="118" r="2" fill="#2563eb"/>
+      <text x="202" y="120" fill="#4a7cbf" font-size="3.5">ישובי הסביבה</text>
     </svg>
   </div>
+
   <div id="panel">
     <div class="panel-section">
-      <div class="section-label">אזורים</div>
+      <div class="section-label">סטטוס ישובים</div>
       <div id="region-tags"></div>
     </div>
     <div id="history">
@@ -287,164 +320,306 @@
     </div>
   </div>
 </div>
+
 <div id="footer">
-  <span>⟳ עדכון כל 5 שניות</span>
+  <span>⟳ עדכון כל 5 שניות · התראה נשמרת 10 דקות</span>
   <span id="footer-wakelock" style="color:#555">💤 מסך פנוי</span>
 </div>
+
 <script>
-const REGIONS = [
-  { id: "north",        label: "צפון",        cities: ["קריית שמונה","צפת","נהריה","עכו","כרמיאל","מעלות","קצרין"] },
-  { id: "haifa",        label: "חיפה",        cities: ["חיפה","קריית ביאליק","קריית אתא","קריית מוצקין","טירת כרמל","זיכרון יעקב"] },
-  { id: "sharon",       label: "שרון",        cities: ["נתניה","הרצליה","כפר סבא","רעננה","הוד השרון","אלקנה"] },
-  { id: "center",       label: "מרכז",        cities: ["תל אביב","רמת גן","בני ברק","פתח תקווה","גבעתיים","חולון","בת ים","אור יהודה"] },
-  { id: "dan",          label: "גוש דן",      cities: ["ראשון לציון","אשדוד","רחובות","לוד","רמלה","מודיעין","יבנה","גדרה"] },
-  { id: "jerusalem",    label: "ירושלים",     cities: ["ירושלים","בית שמש","מעלה אדומים"] },
-  { id: "shfela",       label: "שפלה",        cities: ["אשקלון","קריית גת","שדרות","נתיבות","קריית מלאכי","אופקים"] },
-  { id: "negev_north",  label: "נגב צפוני",   cities: ["באר שבע","דימונה","ערד","רהט","ירוחם","תל שבע"] },
-  { id: "negev_south",  label: "נגב דרומי",   cities: ["מצפה רמון","אילת","יוטבתה","עין יהב"] },
-  { id: "jordan_valley",label: "בקעה",        cities: ["בית שאן","טבריה","יריחו","בקעת הירדן"] },
-  { id: "west_bank_north",label: "שומרון",    cities: ["שכם","טול כרם","קלקיליה","אריאל","כדומים"] },
+// כל ישוב עם מזהה, תווית, שמות oref, ואם זה טבריה
+const CITIES = [
+  { id: "tiberias",     label: "טבריה",       names: ["טבריה"], isTiberias: true },
+  { id: "tzamach",      label: "צמח",          names: ["צמח","בית ירח","כינרת (קיבוץ)"] },
+  { id: "kinneret",     label: "כינרת",        names: ["כינרת","כנרת"] },
+  { id: "beit-yerach",  label: "בית ירח",      names: ["בית ירח"] },
+  { id: "migdal",       label: "מגדל",         names: ["מגדל"] },
+  { id: "ginosar",      label: "גינוסר",       names: ["גינוסר","גנוסר"] },
+  { id: "arbel",        label: "ארבל",         names: ["ארבל"] },
+  { id: "kafr-kana",    label: "כפר כנא",      names: ["כפר כנא","כפר קנא"] },
+  { id: "lavie",        label: "לביא",         names: ["לביא"] },
+  { id: "golani",       label: "צומת גולני",   names: ["גולני","צומת גולני","אילניה"] },
+  { id: "givat-avni",   label: "גבעת אבני",    names: ["גבעת אבני"] },
+  { id: "kafr-zeitim",  label: "כפר זיתים",    names: ["כפר זיתים"] },
+  { id: "kafr-hitim",   label: "כפר חיטים",    names: ["כפר חיטים","חיטין"] },
 ];
+
+// דמו — תרחישים עם ערים אמיתיות מהאזור
 const DEMO_SCENARIOS = [
-  ["תל אביב","רמת גן","גבעתיים","בני ברק"],
-  ["חיפה","קריית ביאליק","קריית אתא"],
-  ["אשקלון","שדרות","נתיבות","אופקים"],
-  ["באר שבע","ירוחם","דימונה"],
+  ["טבריה", "צמח", "כינרת"],
+  ["ארבל", "כפר חיטים", "גבעת אבני"],
+  ["טבריה"],
+  ["לביא", "כפר כנא", "גולני"],
   [],
 ];
-let alertCities=[], alertHistory=[], wakeLockObj=null, wakeLockActive=false;
-let demoMode=false, demoIndex=0, flashOn=true, fetchInterval=null;
-setInterval(()=>{ flashOn=!flashOn; updateMapColors(); },600);
-function buildRegionTags(){
-  const wrap=document.getElementById("region-tags"); wrap.innerHTML="";
-  REGIONS.forEach(r=>{
-    const tag=document.createElement("span");
-    tag.className="region-tag"; tag.id="tag-"+r.id;
-    tag.innerHTML=`<span class="region-dot" id="dot-${r.id}"></span>${r.label}`;
+
+// קטגוריה 1 = כניסה למרחב מוגן. נסנן רק אותה.
+const ENTER_SHELTER_CATEGORY = 1;
+
+let alertCities = [];
+let alertHistory = [];
+let wakeLockObj = null;
+let wakeLockActive = false;
+let demoMode = false;
+let demoIndex = 0;
+let alertClearTimeout = null; // טיימר 10 דקות
+let alertEndTime = null;
+let timerInterval = null;
+
+function cityMatchesAlert(cityNames, alertText) {
+  return cityNames.some(n => alertText.includes(n) || n.includes(alertText));
+}
+
+function getAlertedCityIds(cities) {
+  if (!cities || cities.length === 0) return new Set();
+  const alerted = new Set();
+  CITIES.forEach(c => {
+    cities.forEach(alertCity => {
+      if (cityMatchesAlert(c.names, alertCity)) alerted.add(c.id);
+    });
+  });
+  return alerted;
+}
+
+function buildRegionTags() {
+  const wrap = document.getElementById("region-tags");
+  wrap.innerHTML = "";
+  CITIES.forEach(c => {
+    const tag = document.createElement("span");
+    tag.className = "region-tag" + (c.isTiberias ? " tiberias-tag" : "");
+    tag.id = "tag-" + c.id;
+    tag.innerHTML = `<span class="region-dot" id="dot-tag-${c.id}"></span>${c.label}`;
     wrap.appendChild(tag);
   });
 }
-function getAlertedRegionIds(cities){
-  if(!cities||cities.length===0) return new Set();
-  const alerted=new Set();
-  REGIONS.forEach(r=>{ cities.forEach(city=>{ if(r.cities.some(c=>city.includes(c)||c.includes(city))) alerted.add(r.id); }); });
-  return alerted;
+
+function updateTimer() {
+  if (!alertEndTime) return;
+  const remaining = Math.max(0, Math.round((alertEndTime - Date.now()) / 1000));
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+  const el = document.getElementById("alert-timer");
+  if (el) el.textContent = `ההתראה תפוג בעוד ${mins}:${String(secs).padStart(2,'0')}`;
+  if (remaining === 0) clearAlertDisplay();
 }
-function updateUI(cities){
-  const alerted=getAlertedRegionIds(cities), hasAlert=cities.length>0;
-  document.body.classList.toggle("alert-active",hasAlert);
-  document.getElementById("topbar").classList.toggle("alert-active",hasAlert);
-  const banner=document.getElementById("alert-banner");
-  if(hasAlert){ banner.classList.add("show"); document.getElementById("alert-cities").innerHTML=cities.map(c=>`<span class="alert-city">${c}</span>`).join(""); }
-  else banner.classList.remove("show");
-  document.getElementById("status-dot").className=hasAlert?"alert":"";
-  document.getElementById("status-text").textContent=hasAlert?`התראה פעילה — ${cities.length} אזורים`:"אין התראות פעילות";
-  const sc=document.getElementById("status-circle"), st=document.getElementById("status-map-text");
-  sc.setAttribute("fill",hasAlert?"#ef4444":"#10b981");
-  st.setAttribute("fill",hasAlert?"#ef4444":"#10b981");
-  st.textContent=hasAlert?"⚠ התראה":"✓ שקט";
-  REGIONS.forEach(r=>{
-    const tag=document.getElementById("tag-"+r.id), dot=document.getElementById("dot-"+r.id);
-    if(alerted.has(r.id)){ tag.classList.add("alerted"); dot.classList.add("alerted"); }
-    else{ tag.classList.remove("alerted"); dot.classList.remove("alerted"); }
+
+function clearAlertDisplay() {
+  clearInterval(timerInterval);
+  alertCities = [];
+  alertEndTime = null;
+  updateUI([]);
+}
+
+function scheduleAlertClear() {
+  if (alertClearTimeout) clearTimeout(alertClearTimeout);
+  if (timerInterval) clearInterval(timerInterval);
+  alertEndTime = Date.now() + 10 * 60 * 1000; // 10 דקות
+  alertClearTimeout = setTimeout(clearAlertDisplay, 10 * 60 * 1000);
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+function updateUI(cities) {
+  const alerted = getAlertedCityIds(cities);
+  const hasAlert = cities.length > 0;
+
+  document.body.classList.toggle("alert-active", hasAlert);
+  document.getElementById("topbar").classList.toggle("alert-active", hasAlert);
+
+  const banner = document.getElementById("alert-banner");
+  if (hasAlert) {
+    banner.classList.add("show");
+    document.getElementById("alert-cities").innerHTML = cities.map(c => {
+      const isTib = CITIES.find(x => cityMatchesAlert(x.names, c) && x.isTiberias);
+      return `<span class="alert-city${isTib ? ' tiberias' : ''}">${c}</span>`;
+    }).join("");
+  } else {
+    banner.classList.remove("show");
+    document.getElementById("alert-timer").textContent = "";
+  }
+
+  document.getElementById("status-dot").className = hasAlert ? "alert" : "";
+  document.getElementById("status-text").textContent = hasAlert
+    ? `🚨 התראה פעילה — ${cities.length} ישובים`
+    : "✅ אין התראות פעילות";
+
+  const sc = document.getElementById("status-circle");
+  const st = document.getElementById("status-map-text");
+  sc.setAttribute("fill", hasAlert ? "#ef4444" : "#10b981");
+  st.setAttribute("fill", hasAlert ? "#ef4444" : "#10b981");
+  st.textContent = hasAlert ? "⚠ התראה" : "✓ שקט";
+
+  // עדכן תגיות
+  CITIES.forEach(c => {
+    const tag = document.getElementById("tag-" + c.id);
+    const dot = document.getElementById("dot-tag-" + c.id);
+    if (!tag) return;
+    if (alerted.has(c.id)) {
+      tag.classList.add("alerted");
+      if (dot) dot.classList.add("alerted");
+    } else {
+      tag.classList.remove("alerted");
+      if (dot) dot.classList.remove("alerted");
+    }
   });
-  updateMapColors(alerted);
-}
-function updateMapColors(alerted){
-  if(!alerted) alerted=getAlertedRegionIds(alertCities);
-  REGIONS.forEach(r=>{
-    const g=document.getElementById("region-"+r.id); if(!g) return;
-    const path=g.querySelector("path"), label=g.querySelector("text");
-    const isAlerted=alerted.has(r.id);
-    const old=g.querySelector(".ripple-path"); if(old) old.remove();
-    if(isAlerted){
-      path.setAttribute("fill",flashOn?"#ef4444":"#991b1b");
-      path.setAttribute("stroke","#ff6666"); path.setAttribute("stroke-width","1.5");
-      path.setAttribute("filter","url(#alertGlow)");
-      if(label) label.setAttribute("fill","#ffcccc");
-      if(flashOn){
-        const ripple=document.createElementNS("http://www.w3.org/2000/svg","path");
-        ripple.setAttribute("d",path.getAttribute("d")); ripple.setAttribute("fill","none");
-        ripple.setAttribute("stroke","#ff4444"); ripple.setAttribute("stroke-width","3");
-        ripple.setAttribute("stroke-opacity","0.6"); ripple.classList.add("ripple-path");
-        g.appendChild(ripple);
+
+  // עדכן נקודות על המפה
+  CITIES.forEach(c => {
+    const dot = document.getElementById("dot-" + c.id);
+    const cityG = document.getElementById("city-" + c.id);
+    if (!dot) return;
+    const isAlerted = alerted.has(c.id);
+    if (isAlerted) {
+      dot.setAttribute("fill", c.isTiberias ? "#fde047" : "#ef4444");
+      dot.setAttribute("r", c.isTiberias ? "4" : "3");
+      if (cityG) cityG.setAttribute("filter", "url(#cityGlow)");
+      // עיגול חיצוני
+      const circle = cityG ? cityG.querySelector("circle") : null;
+      if (circle) {
+        circle.setAttribute("fill", c.isTiberias ? "#713f12" : "#7f1d1d");
+        circle.setAttribute("stroke", c.isTiberias ? "#fde047" : "#ef4444");
+        circle.setAttribute("stroke-width", "1.2");
       }
     } else {
-      path.setAttribute("fill","#0f1f3d"); path.setAttribute("stroke","#2563eb");
-      path.setAttribute("stroke-width","0.8"); path.removeAttribute("filter");
-      if(label) label.setAttribute("fill","#4a7cbf");
+      dot.setAttribute("fill", c.isTiberias ? "#3b82f6" : "#2563eb");
+      dot.setAttribute("r", c.isTiberias ? "2.5" : "1.5");
+      if (cityG) cityG.removeAttribute("filter");
+      const circle = cityG ? cityG.querySelector("circle") : null;
+      if (circle) {
+        circle.setAttribute("fill", c.isTiberias ? "#1e3a5f" : "#0f1f3d");
+        circle.setAttribute("stroke", c.isTiberias ? "#3b82f6" : "#2563eb");
+        circle.setAttribute("stroke-width", c.isTiberias ? "0.8" : "0.6");
+      }
     }
   });
 }
-function addHistory(cities){
-  if(cities.length===0) return;
-  alertHistory.unshift({cities:[...cities],time:new Date().toLocaleTimeString("he-IL")});
-  if(alertHistory.length>10) alertHistory.pop();
+
+function addHistory(cities) {
+  if (cities.length === 0) return;
+  alertHistory.unshift({ cities: [...cities], time: new Date().toLocaleTimeString("he-IL") });
+  if (alertHistory.length > 15) alertHistory.pop();
   renderHistory();
 }
-function renderHistory(){
-  const list=document.getElementById("history-list");
-  if(alertHistory.length===0){ list.innerHTML='<div style="color:#333;font-size:12px;text-align:center;padding:10px">אין היסטוריה עדיין</div>'; return; }
-  list.innerHTML=alertHistory.map((h,i)=>`<div class="hist-item" style="opacity:${1-i*0.08}"><div class="hist-time">🕐 ${h.time}</div><div>${h.cities.map(c=>`<span class="hist-city">${c}</span>`).join("")}</div></div>`).join("");
+
+function renderHistory() {
+  const list = document.getElementById("history-list");
+  if (alertHistory.length === 0) {
+    list.innerHTML = '<div style="color:#333;font-size:12px;text-align:center;padding:10px">אין היסטוריה עדיין</div>';
+    return;
+  }
+  list.innerHTML = alertHistory.map((h, i) => `
+    <div class="hist-item" style="opacity:${Math.max(0.3, 1 - i * 0.07)}">
+      <div class="hist-time">🕐 ${h.time}</div>
+      <div>${h.cities.map(c => `<span class="hist-city">${c}</span>`).join("")}</div>
+    </div>
+  `).join("");
 }
-async function fetchOref(){
-  try{
-    const res=await fetch("https://www.oref.org.il/WarningMessages/alert/alerts.json",{headers:{"X-Requested-With":"XMLHttpRequest","Referer":"https://www.oref.org.il/"},cache:"no-store"});
-    const text=(await res.text()).replace(/^\uFEFF/,"").trim();
-    const cities=text?(JSON.parse(text).data||[]):[];
-    if(cities.length>alertCities.length&&cities.length>0){ playBeep(); addHistory(cities); }
-    alertCities=cities; updateUI(cities);
-  }catch(e){}
-  document.getElementById("lastupdate").textContent="עודכן: "+new Date().toLocaleTimeString("he-IL");
-}
-function playBeep(){
-  try{
-    const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    [0,0.35,0.7].forEach(delay=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value=delay===0.35?660:880;
-      g.gain.setValueAtTime(0.25,ctx.currentTime+delay);
-      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+0.3);
-      o.start(ctx.currentTime+delay); o.stop(ctx.currentTime+delay+0.35);
+
+async function fetchOref() {
+  try {
+    const res = await fetch("https://www.oref.org.il/WarningMessages/alert/alerts.json", {
+      headers: { "X-Requested-With": "XMLHttpRequest", "Referer": "https://www.oref.org.il/" },
+      cache: "no-store"
     });
-  }catch(e){}
+    const text = (await res.text()).replace(/^\uFEFF/, "").trim();
+    if (!text) {
+      // אין התראה פעילה — לא מנקים (ממתינים 10 דקות)
+      document.getElementById("lastupdate").textContent = "עודכן: " + new Date().toLocaleTimeString("he-IL");
+      return;
+    }
+    const data = JSON.parse(text);
+
+    // סינון רק כניסה למרחב מוגן (category 1)
+    const cat = parseInt(data.cat || data.category || "0");
+    if (cat !== 0 && cat !== ENTER_SHELTER_CATEGORY) {
+      document.getElementById("lastupdate").textContent = "עודכן: " + new Date().toLocaleTimeString("he-IL") + " (סוג אחר)";
+      return;
+    }
+
+    const cities = data.data || [];
+    if (cities.length > 0) {
+      const isNew = cities.some(c => !alertCities.includes(c));
+      if (isNew) {
+        playBeep();
+        addHistory(cities);
+      }
+      alertCities = cities;
+      updateUI(cities);
+      scheduleAlertClear(); // מפעיל טיימר 10 דקות
+    }
+  } catch(e) {}
+  document.getElementById("lastupdate").textContent = "עודכן: " + new Date().toLocaleTimeString("he-IL");
 }
-function toggleDemo(){
-  demoMode=!demoMode;
-  const btn=document.getElementById("btn-demo");
-  btn.textContent=demoMode?"■ עצור דמו":"▶ דמו";
-  btn.classList.toggle("active",demoMode);
-  if(!demoMode){ alertCities=[]; updateUI([]); } else runDemo();
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.35, 0.7].forEach(delay => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = delay === 0.35 ? 660 : 880;
+      g.gain.setValueAtTime(0.3, ctx.currentTime + delay);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.3);
+      o.start(ctx.currentTime + delay);
+      o.stop(ctx.currentTime + delay + 0.35);
+    });
+  } catch(e) {}
 }
-function runDemo(){
-  if(!demoMode) return;
-  const cities=DEMO_SCENARIOS[demoIndex%DEMO_SCENARIOS.length]; demoIndex++;
-  if(cities.length>0){ playBeep(); addHistory(cities); }
-  alertCities=cities; updateUI(cities);
-  document.getElementById("lastupdate").textContent="דמו — "+new Date().toLocaleTimeString("he-IL");
-  setTimeout(runDemo,3000);
+
+function toggleDemo() {
+  demoMode = !demoMode;
+  const btn = document.getElementById("btn-demo");
+  btn.textContent = demoMode ? "■ עצור דמו" : "▶ דמו";
+  btn.classList.toggle("active", demoMode);
+  if (!demoMode) {
+    if (alertClearTimeout) clearTimeout(alertClearTimeout);
+    if (timerInterval) clearInterval(timerInterval);
+    alertCities = []; alertEndTime = null;
+    updateUI([]);
+  } else {
+    runDemo();
+  }
 }
-async function toggleWakeLock(){
-  const btn=document.getElementById("btn-wakelock"), footer=document.getElementById("footer-wakelock");
-  if(!("wakeLock" in navigator)){ alert("הדפדפן שלך לא תומך ב-Wake Lock.\nנסה כרום עדכני."); return; }
-  if(!wakeLockActive){
-    try{
-      wakeLockObj=await navigator.wakeLock.request("screen");
-      wakeLockActive=true; btn.textContent="☀️ מסך נעול"; btn.classList.add("active");
-      footer.textContent="☀️ מסך נעול"; footer.style.color="#10b981";
-      wakeLockObj.addEventListener("release",()=>{ wakeLockActive=false; btn.textContent="💤 נעל מסך"; btn.classList.remove("active"); footer.textContent="💤 מסך פנוי"; footer.style.color="#555"; });
-    }catch(e){ alert("שגיאה: "+e.message); }
+
+function runDemo() {
+  if (!demoMode) return;
+  const cities = DEMO_SCENARIOS[demoIndex % DEMO_SCENARIOS.length];
+  demoIndex++;
+  if (cities.length > 0) { playBeep(); addHistory(cities); scheduleAlertClear(); }
+  alertCities = cities;
+  updateUI(cities);
+  document.getElementById("lastupdate").textContent = "דמו — " + new Date().toLocaleTimeString("he-IL");
+  setTimeout(runDemo, 4000);
+}
+
+async function toggleWakeLock() {
+  const btn = document.getElementById("btn-wakelock");
+  const footer = document.getElementById("footer-wakelock");
+  if (!("wakeLock" in navigator)) { alert("הדפדפן שלך לא תומך ב-Wake Lock.\nנסה כרום עדכני."); return; }
+  if (!wakeLockActive) {
+    try {
+      wakeLockObj = await navigator.wakeLock.request("screen");
+      wakeLockActive = true;
+      btn.textContent = "☀️ מסך נעול"; btn.classList.add("active");
+      footer.textContent = "☀️ מסך נעול"; footer.style.color = "#10b981";
+      wakeLockObj.addEventListener("release", () => {
+        wakeLockActive = false;
+        btn.textContent = "💤 נעל מסך"; btn.classList.remove("active");
+        footer.textContent = "💤 מסך פנוי"; footer.style.color = "#555";
+      });
+    } catch(e) { alert("שגיאה: " + e.message); }
   } else { await wakeLockObj.release(); }
 }
-document.addEventListener("visibilitychange",async()=>{
-  if(wakeLockActive&&document.visibilityState==="visible"){
-    try{ wakeLockObj=await navigator.wakeLock.request("screen"); }catch(e){}
+
+document.addEventListener("visibilitychange", async () => {
+  if (wakeLockActive && document.visibilityState === "visible") {
+    try { wakeLockObj = await navigator.wakeLock.request("screen"); } catch(e) {}
   }
 });
-buildRegionTags(); updateUI([]); fetchOref();
-fetchInterval=setInterval(()=>{ if(!demoMode) fetchOref(); },5000);
+
+buildRegionTags();
+updateUI([]);
+fetchOref();
+setInterval(() => { if (!demoMode) fetchOref(); }, 5000);
 </script>
 </body>
 </html>
-```
