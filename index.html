@@ -549,9 +549,9 @@ function renderHistory(){
 }
 
 // ─── FETCH ───────────────────────────────────────────────
-async function fetchOref(){
+async function fetch(){
   try{
-    const res=await fetch("https://www.oref.org.il/WarningMessages/alert/alerts.json",{
+    const res=await fetch("https://oref-deploy.oriyaziv.workers.dev/alerts",{
       headers:{"X-Requested-With":"XMLHttpRequest","Referer":"https://www.oref.org.il/"},cache:"no-store"});
     const text=(await res.text()).replace(/^\uFEFF/,"").trim();
     if(!text){ document.getElementById("lastupdate").textContent="עודכן: "+new Date().toLocaleTimeString("he-IL"); return; }
